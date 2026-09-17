@@ -6,11 +6,8 @@
     <title>BUDGET MANAGER — PLOU & NIKELO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
+
     <style>
-        /* ============================================================
-           BUDGET MANAGER - DARK NEON THEME (FULL)
-           ============================================================ */
         :root {
             --bg: #0d0d12;
             --bg-card: #1a1a24;
@@ -28,10 +25,8 @@
         * { box-sizing: border-box; }
 
         body {
-            margin: 0;
-            padding: 0;
-            background: var(--bg);
-            color: var(--text);
+            margin: 0; padding: 0;
+            background: var(--bg); color: var(--text);
             font-family: system-ui, -apple-system, sans-serif;
             text-transform: uppercase;
         }
@@ -39,24 +34,26 @@
         h1,h2,h3,h4 { margin: 0; font-weight: 600; }
         button { cursor: pointer; border: none; outline: none; font-family: inherit; }
 
-        /* === ANIMATIONS === */
         @keyframes neonPulseLogo {
             0%,100% { color: var(--neon-purple); text-shadow: 0 0 6px var(--neon-purple-glow), 0 0 14px var(--neon-purple-glow); }
             50% { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan-glow), 0 0 18px var(--neon-cyan-glow); }
         }
         @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
         @keyframes backupPulse { 0%,100% { box-shadow:0 0 15px var(--neon-cyan-glow); } 50% { box-shadow:0 0 25px var(--neon-cyan-glow); } }
-        @keyframes blink-plou { 0%,100% { opacity:1; transform:scale(1); box-shadow:0 0 15px var(--neon-cyan-glow); } 50% { opacity:0.8; transform:scale(1.05); box-shadow:0 0 25px var(--neon-cyan-glow); } }
-        @keyframes blink-nikelo { 0%,100% { opacity:1; transform:scale(1); box-shadow:0 0 15px var(--neon-purple-glow); } 50% { opacity:0.8; transform:scale(1.05); box-shadow:0 0 25px var(--neon-purple-glow); } }
 
-        /* === MOBILE CARDS === */
+        @keyframes bubblePulseCyan {
+            0%,100% { box-shadow: 0 0 8px var(--neon-cyan-glow), 0 0 15px var(--neon-cyan-glow); transform: scale(1); }
+            50%     { box-shadow: 0 0 14px var(--neon-cyan-glow), 0 0 28px var(--neon-cyan-glow); transform: scale(1.12); }
+        }
+        @keyframes bubblePulsePurple {
+            0%,100% { box-shadow: 0 0 8px var(--neon-purple-glow), 0 0 15px var(--neon-purple-glow); transform: scale(1); }
+            50%     { box-shadow: 0 0 14px var(--neon-purple-glow), 0 0 28px var(--neon-purple-glow); transform: scale(1.12); }
+        }
+
         .mobile-entries { display: none; margin-top:20px; }
         .mobile-entry-card {
-            background: var(--bg-card);
-            border: 1px solid var(--neon-purple);
-            border-radius: var(--radius);
-            padding: 15px;
-            margin-bottom: 15px;
+            background: var(--bg-card); border: 1px solid var(--neon-purple);
+            border-radius: var(--radius); padding: 15px; margin-bottom: 15px;
         }
         .card-header { display:flex; justify-content:space-between; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--bg-glass); }
         .card-date { color: var(--neon-cyan); font-weight:600; }
@@ -71,7 +68,6 @@
         .card-actions { display:flex; gap:10px; margin-top:15px; }
         .card-actions button { background:none; border:1px solid var(--bg-glass); color:var(--text-dim); padding:6px 12px; border-radius:6px; flex:1; }
 
-        /* === FLOATING DEBT === */
         .floating-debt {
             position: fixed; bottom:30px; right:30px;
             background:rgba(26,26,36,0.95); backdrop-filter:blur(10px);
@@ -85,7 +81,6 @@
         .debt-plou .debt-amount { color:var(--neon-cyan); }
         .debt-none .debt-amount { color:#00ff00; }
 
-        /* === BACKUP NOTIFICATION === */
         #backupNotification {
             position:fixed; top:80px; left:30px;
             background:var(--bg-card); border:2px solid var(--neon-cyan); border-radius:var(--radius);
@@ -96,7 +91,6 @@
         .backup-notification-details { font-size:0.85rem; color:var(--text); }
         .backup-notification-details strong { color:var(--neon-purple); }
 
-        /* === TOP BAR === */
         .topbar {
             position:sticky; top:0; z-index:50;
             background:var(--bg-card); padding:14px 22px;
@@ -109,7 +103,6 @@
         .center-section { display:flex; gap:12px; align-items:center; justify-content:center; flex:2; min-width:300px; flex-wrap:wrap; }
         .right-section { display:flex; gap:6px; align-items:center; justify-content:flex-end; flex:1; min-width:200px; flex-wrap:wrap; }
 
-        /* === BUTTONS === */
         .pill-btn {
             padding:8px 12px; border-radius:999px; font-weight:600;
             display:flex; align-items:center; justify-content:center;
@@ -132,8 +125,11 @@
         .tab-purple { color:var(--neon-purple); border-color:var(--neon-purple); box-shadow:0 0 8px var(--neon-purple-glow); }
         .tab-purple:hover { box-shadow:0 0 14px var(--neon-purple-glow); transform:scale(1.05); }
 
-        /* === MAIN === */
         main { padding:25px; max-width:1200px; margin:0 auto; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
         .table-card {
             background:var(--bg-card); padding:15px; border-radius:var(--radius);
             box-shadow:0 0 20px rgba(0,0,0,0.35); border:1px solid var(--bg-glass);
@@ -144,7 +140,6 @@
             padding-bottom:8px; margin-bottom:15px; font-size:1rem;
         }
 
-        /* === FILTERS === */
         .month-filter { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
         .month-filter-btn {
             padding:8px 15px; border-radius:20px; background:transparent;
@@ -153,19 +148,8 @@
         }
         .month-filter-btn:hover { background:var(--neon-cyan); color:#000; }
         .month-filter-btn.active { background:var(--neon-cyan); color:#000; box-shadow:0 0 10px var(--neon-cyan-glow); }
-        .month-selector-container { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:15px; }
-        .month-selector-btn {
-            padding:6px 12px; border-radius:20px; background:transparent;
-            border:2px solid var(--neon-cyan); color:var(--neon-cyan); font-size:0.8rem;
-            min-width:60px; text-align:center; transition:var(--transition);
-        }
-        .month-selector-btn:hover { background:var(--neon-cyan); color:#000; }
-        .month-selector-btn.active { background:var(--neon-cyan); color:#000; box-shadow:0 0 10px var(--neon-cyan-glow); }
 
-        /* === TABLES === */
-        .compact-table {
-            width:100%; border-collapse:collapse; margin-top:10px; border-radius:8px; overflow:hidden; font-size:0.8rem;
-        }
+        .compact-table { width:100%; border-collapse:collapse; margin-top:10px; border-radius:8px; overflow:hidden; font-size:0.8rem; }
         .compact-table th {
             text-align:left; padding:10px 8px; color:#000;
             background:linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
@@ -175,23 +159,27 @@
         .compact-table tr:hover { background:rgba(127,90,240,0.12); }
         .table-footer { margin-top:15px; padding-top:10px; border-top:1px solid var(--bg-glass); font-size:0.8rem; color:var(--text-dim); text-align:center; }
 
-        /* === MODALS === */
-        .all-entries-modal, .entries-modal, .modal {
+        .all-entries-modal, .entries-modal, .modal, .day-details-modal {
             position:fixed; inset:0; background:rgba(0,0,0,0.85);
             display:none; align-items:center; justify-content:center; z-index:2000; padding:20px;
         }
-        .all-entries-modal-content, .entries-modal-content, .modal-content {
+        .all-entries-modal-content, .entries-modal-content, .modal-content, .day-details-modal-content {
             background:var(--bg-card); padding:25px; border-radius:var(--radius);
             border:2px solid var(--neon-purple); box-shadow:0 0 40px var(--neon-purple-glow);
         }
         .all-entries-modal-content { width:95%; max-width:1400px; max-height:90vh; overflow-y:auto; }
         .entries-modal-content { width:90%; max-width:500px; max-height:80vh; overflow-y:auto; }
         .modal-content { width:90%; max-width:420px; }
+        .day-details-modal-content { width:90%; max-width:500px; max-height:80vh; overflow-y:auto; }
         .all-entries-modal-content h2 { color:var(--neon-purple); }
-        .entries-modal-header h3 { color:var(--neon-cyan); }
+        .entries-modal-header, .day-details-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+        .entries-modal-header h3 { color:var(--neon-cyan); font-size:1rem; }
+        .day-details-header h3 { color:var(--neon-cyan); font-size:1rem; }
+        .close-entries-btn, .close-day-details-btn { background:none; border:none; color:var(--text-dim); font-size:1.2rem; cursor:pointer; }
+        .close-entries-btn:hover, .close-day-details-btn:hover { color:var(--neon-cyan); }
         .modal-content h2 { color:var(--neon-cyan); }
-        .entries-total { background:rgba(61,232,255,0.1); border:1px solid var(--neon-cyan); border-radius:10px; padding:12px; margin-bottom:15px; }
-        .entries-total strong { color:var(--neon-purple); }
+        .entries-total, .day-details-total { background:rgba(61,232,255,0.1); border:1px solid var(--neon-cyan); border-radius:10px; padding:12px; margin-bottom:15px; }
+        .entries-total strong, .day-details-total strong { color:var(--neon-purple); }
 
         .modal-content label { display:block; margin-top:12px; font-size:0.9rem; color:var(--neon-cyan); }
         .modal-content input, .modal-content select {
@@ -212,9 +200,285 @@
             background:rgba(61,232,255,0.1); border:2px solid var(--neon-cyan);
             color:var(--neon-cyan); padding:8px 16px; border-radius:25px;
         }
+        .modal-load-more-container { text-align:center; margin-top:15px; }
         .compact-table input[type="checkbox"] { width:16px; height:16px; accent-color:var(--neon-cyan); cursor:pointer; }
 
-        /* === DIGITAL CLOCK === */
+        /* ====== BUBBLE CARDS (ΙΣΟΖΥΓΙΟ) ====== */
+        .full-bubble-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 5px;
+        }
+        .bubble-card {
+            background: linear-gradient(135deg, rgba(127,90,240,0.15), rgba(61,232,255,0.08));
+            border: 2px solid var(--neon-purple);
+            border-radius: var(--radius);
+            padding: 18px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 0 12px rgba(127,90,240,0.25);
+        }
+        .bubble-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 22px var(--neon-cyan-glow);
+            transform: translateY(-4px) scale(1.03);
+        }
+        .bubble-card h3 {
+            color: var(--neon-cyan);
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 8px var(--neon-cyan-glow);
+        }
+        .bubble-count { color: var(--text-dim); font-size: 0.75rem; margin-bottom: 10px; }
+
+        .bubble-split {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .bubble-person {
+            flex: 1;
+            padding: 6px 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .bubble-person .bp-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+        .bubble-person .bp-amount {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .bubble-person.plou {
+            border-color: rgba(61,232,255,0.35);
+            background: rgba(61,232,255,0.06);
+        }
+        .bubble-person.plou .bp-label { color: var(--neon-cyan); }
+        .bubble-person.plou .bp-amount { color: var(--neon-cyan); }
+        .bubble-person.nikelo {
+            border-color: rgba(127,90,240,0.35);
+            background: rgba(127,90,240,0.06);
+        }
+        .bubble-person.nikelo .bp-label { color: var(--neon-purple); }
+        .bubble-person.nikelo .bp-amount { color: var(--neon-purple); }
+
+        .bubble-total-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 8px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+        }
+        .bubble-total-line .btl-value {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--text);
+            font-size: 0.85rem;
+        }
+
+        .bubble-debt {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding-top: 8px;
+            border-top: 1px solid var(--bg-glass);
+        }
+        .bubble-debt.none { color: #00ff00; }
+        .bubble-debt.nikelo { color: var(--neon-purple); }
+        .bubble-debt.plou { color: var(--neon-cyan); }
+
+        .analysis-empty {
+            padding: 30px 20px; text-align: center; color: var(--text-dim);
+            grid-column: 1 / -1;
+        }
+        .analysis-empty i { font-size: 2rem; display: block; margin-bottom: 10px; }
+
+        /* ====== ENTRIES LIST ====== */
+        .entries-list { max-height: 45vh; overflow-y: auto; padding-right: 5px; }
+        .entry-row {
+            display: grid;
+            grid-template-columns: 90px 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--bg-glass);
+            font-size: 0.8rem;
+        }
+        .entry-row:hover { background: rgba(127,90,240,0.1); }
+        .entry-row .er-date { color: var(--neon-cyan); }
+        .entry-row .er-cat { color: var(--text); }
+        .entry-row .er-amount { font-family: 'Courier New', monospace; font-weight: 700; color: var(--text); }
+        .entry-row .er-person.plou { color: var(--neon-cyan); }
+        .entry-row .er-person.nikelo { color: var(--neon-purple); }
+        .entries-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+        /* ====== ΗΜΕΡΟΛΟΓΙΟ (HEATMAP GRID) ====== */
+        .calendar-month-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+        .calendar-month-btn {
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: transparent;
+            border: 2px solid var(--neon-purple);
+            color: var(--neon-purple);
+            font-size: 0.72rem;
+            font-weight: 600;
+            transition: var(--transition);
+            opacity: 0.45;
+            cursor: not-allowed;
+            min-width: 50px;
+        }
+        .calendar-month-btn.has-data {
+            opacity: 1;
+            cursor: pointer;
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 6px var(--neon-cyan-glow);
+        }
+        .calendar-month-btn.has-data:hover {
+            background: var(--neon-cyan);
+            color: #000;
+        }
+        .calendar-month-btn.active {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 12px var(--neon-cyan-glow);
+            border-color: var(--neon-cyan);
+            opacity: 1;
+        }
+
+        .calendar-grid-wrapper {
+            overflow-x: auto;
+            padding-bottom: 8px;
+            border-radius: 10px;
+        }
+        .calendar-grid {
+            display: grid;
+            gap: 3px;
+            min-width: max-content;
+        }
+        .calendar-cell {
+            min-width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.7rem;
+            transition: var(--transition);
+        }
+        .calendar-cell.day-header {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+            color: #000;
+            font-weight: 700;
+            font-size: 0.75rem;
+            border: none;
+        }
+        .calendar-cell.category-header {
+            background: rgba(127,90,240,0.15);
+            color: var(--neon-cyan);
+            font-weight: 600;
+            justify-content: flex-start;
+            padding: 0 10px;
+            min-width: 130px;
+            font-size: 0.72rem;
+            border: 1px solid rgba(127,90,240,0.4);
+            text-shadow: 0 0 6px var(--neon-cyan-glow);
+        }
+        .calendar-cell.empty-corner {
+            background: transparent;
+            border: none;
+        }
+        .calendar-cell.has-payment {
+            cursor: pointer;
+            background: rgba(61,232,255,0.04);
+        }
+        .calendar-cell.has-payment:hover {
+            background: rgba(127,90,240,0.18);
+            border-color: var(--neon-cyan);
+            transform: scale(1.06);
+        }
+
+        .payment-bubble {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #000;
+            font-family: 'Courier New', monospace;
+        }
+        .payment-bubble.plou {
+            background: var(--neon-cyan);
+            animation: bubblePulseCyan 1.6s ease-in-out infinite;
+        }
+        .payment-bubble.nikelo {
+            background: var(--neon-purple);
+            animation: bubblePulsePurple 1.6s ease-in-out infinite;
+        }
+        .payment-bubble.plou:hover,
+        .payment-bubble.nikelo:hover {
+            animation-play-state: paused;
+            transform: scale(1.15);
+        }
+
+        .calendar-legend {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid var(--bg-glass);
+            font-size: 0.78rem;
+        }
+        .calendar-legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-bubble {
+            width: 18px; height: 18px; border-radius: 50%;
+        }
+        .legend-bubble.plou {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan-glow);
+        }
+        .legend-bubble.nikelo {
+            background: var(--neon-purple);
+            box-shadow: 0 0 8px var(--neon-purple-glow);
+        }
+
+        .calendar-empty-msg {
+            padding: 25px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+        .calendar-empty-msg i {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--neon-purple);
+        }
+
         .digital-clock {
             position:absolute; bottom:30px; left:30px;
             font-family:'Courier New',monospace; font-weight:700;
@@ -238,7 +502,6 @@
         .debt-nikelo { color:var(--neon-purple); font-weight:600; }
         .debt-plou { color:var(--neon-cyan); font-weight:600; }
 
-        /* === RESPONSIVE === */
         @media (max-width:768px) {
             .compact-table { display:none !important; }
             .mobile-entries { display:block !important; }
@@ -252,9 +515,15 @@
             .pill-btn, .tab { padding:6px 10px; font-size:0.75rem; min-width:36px; min-height:36px; }
             .all-entries-modal-content { padding:15px; }
             .entries-modal-content { padding:15px; }
+            .day-details-modal-content { padding:15px; }
             .month-filter { flex-direction:column; }
             .month-filter-btn { width:100%; }
-            .month-selector-container { justify-content:center; }
+            .full-bubble-grid-container { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .entry-row { grid-template-columns: 80px 1fr auto; font-size: 0.72rem; }
+            .entry-row .er-person { display: none; }
+            .calendar-cell { min-width: 30px; height: 30px; }
+            .calendar-cell.category-header { min-width: 100px; font-size: 0.65rem; }
+            .payment-bubble { width: 17px; height: 17px; font-size: 0.6rem; }
         }
     </style>
 </head>
@@ -263,9 +532,9 @@
     <!-- DIGITAL CLOCK -->
     <div id="digitalClock" class="digital-clock">
         <div class="full-date">
-            <span class="weekday">Δευτέρα</span>, 
-            <span class="day">3</span> 
-            <span class="month">Δεκεμβρίου</span> 
+            <span class="weekday">Δευτέρα</span>,
+            <span class="day">3</span>
+            <span class="month">Δεκεμβρίου</span>
             <span class="year">1894</span>
         </div>
         <div class="time-section">
@@ -274,7 +543,7 @@
             </span>
         </div>
     </div>
-    
+
     <!-- FLOATING DEBT -->
     <div id="floatingDebt" class="floating-debt" style="display: none;">
         <h3><i class="fas fa-scale-balanced"></i> ΖΩΝΤΑΝΟ ΧΡΕΟΣ</h3>
@@ -308,9 +577,7 @@
                     <i class="fas fa-trash"></i> ΔΙΑΓΡΑΦΗ ΕΠΙΛΕΓΜΕΝΩΝ
                 </button>
             </div>
-            <div class="month-selector-container" id="allEntriesMonthSelector">
-                <button class="month-selector-btn active" data-month="all">ΌΛΑ</button>
-            </div>
+            <div class="month-selector-container" id="allEntriesMonthSelector" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px;"></div>
             <table class="compact-table" id="allEntriesTable">
                 <thead>
                     <tr>
@@ -333,7 +600,7 @@
         </div>
     </div>
 
-    <!-- ENTRIES DETAILS MODAL -->
+    <!-- ENTRIES DETAILS MODAL (για κάρτες Ισοζυγίου) -->
     <div id="entriesDetailsModal" class="entries-modal">
         <div class="entries-modal-content">
             <div class="entries-modal-header">
@@ -342,12 +609,30 @@
             </div>
             <div class="entries-total">
                 <i class="fas fa-calendar-alt"></i>
-                <span>ΣΥΝΟΛΟ: <strong>0 καταχωρήσεις - 0€</strong></span>
+                <span>ΣΥΝΟΛΟ: <strong id="entriesTotalText">0 καταχωρήσεις - 0€</strong></span>
             </div>
             <div class="entries-list" id="entriesList"></div>
             <div class="entries-actions">
                 <button class="btn-secondary" onclick="goBackToGrid()"><i class="fas fa-arrow-left"></i> ΠΙΣΩ ΣΤΟ ΠΛΕΓΜΑ</button>
                 <button class="btn-primary" onclick="closeEntriesModal()">ΚΛΕΙΣΙΜΟ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DAY DETAILS MODAL (για Ημερολόγιο) -->
+    <div id="dayDetailsModal" class="day-details-modal">
+        <div class="day-details-modal-content">
+            <div class="day-details-header">
+                <h3 id="dayDetailsTitle">ΗΜΕΡΟΛΟΓΙΟ</h3>
+                <button class="close-day-details-btn" onclick="closeDayDetailsModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="day-details-total">
+                <i class="fas fa-coins"></i>
+                <span>ΣΥΝΟΛΟ: <strong id="dayDetailsTotalText">0 πληρωμές - 0€</strong></span>
+            </div>
+            <div class="entries-list" id="dayDetailsList"></div>
+            <div class="entries-actions">
+                <button class="btn-primary" onclick="closeDayDetailsModal()">ΚΛΕΙΣΙΜΟ</button>
             </div>
         </div>
     </div>
@@ -367,7 +652,7 @@
             <button id="backupBtn" class="pill-btn backup-btn button-tooltip" data-tooltip="ΑΠΟΘΗΚΕΥΣΗ"><i class="fas fa-save"></i></button>
             <button id="restoreBtn" class="pill-btn restore-btn button-tooltip" data-tooltip="ΕΠΑΝΑΦΟΡΗ"><i class="fas fa-history"></i></button>
         </div>
-        <input type="file" id="fileInput" accept=".json,.xlsx,.xls" style="display:none;">
+        <input type="file" id="fileInput" accept=".json,.xlsx,.xls,application/json" style="display:none;">
     </header>
 
     <main>
@@ -392,28 +677,24 @@
         <section id="balance" class="tab-content">
             <div class="table-card">
                 <h2><i class="fas fa-scale-balanced"></i> ΙΣΟΖΥΓΙΟ ΑΝΑ ΜΗΝΑ</h2>
-                <table class="compact-table" id="balanceTable">
-                    <thead><tr><th>ΜΗΝΑΣ</th><th>PLOU (€)</th><th>NIKELO (€)</th><th>ΧΡΕΟΣ</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div id="categorySummaryContainer" class="table-card" style="margin-top:20px;">
-                <h2><i class="fas fa-layer-group"></i> ΣΥΝΟΛΑ ΑΝΑ ΚΑΤΗΓΟΡΙΑ</h2>
-                <table class="compact-table" id="categorySummaryTable">
-                    <thead><tr><th>ΚΑΤΗΓΟΡΙΑ</th><th>ΠΛΗΘΟΣ</th><th>PLOU</th><th>NIKELO</th><th>NET ΧΡΕΟΣ</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+                <div class="full-bubble-grid-container" id="fullBubbleGridContainer"></div>
             </div>
         </section>
 
         <!-- ΑΝΑΛΥΣΗ -->
         <section id="analysis" class="tab-content">
             <div class="table-card">
-                <h2><i class="fas fa-chart-pie"></i> ΑΝΑΛΥΣΗ ΚΑΤΗΓΟΡΙΩΝ ΚΑΙ ΜΗΝΩΝ</h2>
-                <div class="full-bubble-grid-container" id="fullBubbleGridContainer">
-                    <div style="padding:20px;text-align:center;color:var(--text-dim);">
-                        <i class="fas fa-chart-pie" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-                        Πλέγμα ανάλυσης
+                <h2><i class="fas fa-calendar-alt"></i> ΗΜΕΡΟΛΟΓΙΟ ΠΛΗΡΩΜΩΝ</h2>
+                <div class="calendar-month-selector" id="calendarMonthSelector"></div>
+                <div id="calendarGridContainer"></div>
+                <div class="calendar-legend">
+                    <div class="calendar-legend-item">
+                        <div class="legend-bubble plou"></div>
+                        <span>PLOU</span>
+                    </div>
+                    <div class="calendar-legend-item">
+                        <div class="legend-bubble nikelo"></div>
+                        <span>NIKELO</span>
                     </div>
                 </div>
             </div>
@@ -479,18 +760,15 @@
                 return raw ? JSON.parse(raw) : [];
             } catch(e) { return []; }
         }
-
         function saveData(data) {
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
         }
-
         function loadBackup() {
             try {
                 const raw = localStorage.getItem(BACKUP_KEY);
                 return raw ? JSON.parse(raw) : null;
             } catch(e) { return null; }
         }
-
         function saveBackup(backupData) {
             try { localStorage.setItem(BACKUP_KEY, JSON.stringify(backupData)); } catch(e) {}
         }
@@ -499,6 +777,7 @@
         let selectedEntries = new Set();
         let modalCurrentLimit = 10;
         let modalCurrentFilter = 'all';
+        let calendarSelectedMonth = null;
 
         function getCategoryIcon(cat) {
             const icons = {
@@ -509,15 +788,30 @@
             return icons[cat] || '📋';
         }
 
+        const MONTH_LABELS = ['ΙΑΝ','ΦΕΒ','ΜΑΡ','ΑΠΡ','ΜΑΙ','ΙΟΥΝ','ΙΟΥΛ','ΑΥΓ','ΣΕΠ','ΟΚΤ','ΝΟΕ','ΔΕΚ'];
+        const MONTH_FULL = ['ΙΑΝΟΥΑΡΙΟΣ','ΦΕΒΡΟΥΑΡΙΟΣ','ΜΑΡΤΙΟΣ','ΑΠΡΙΛΙΟΣ','ΜΑΪΟΣ','ΙΟΥΝΙΟΣ','ΙΟΥΛΙΟΣ','ΑΥΓΟΥΣΤΟΣ','ΣΕΠΤΕΜΒΡΙΟΣ','ΟΚΤΩΒΡΙΟΣ','ΝΟΕΜΒΡΙΟΣ','ΔΕΚΕΜΒΡΙΟΣ'];
+        const MONTH_DAYS = [31,28,31,30,31,30,31,31,30,31,30,31];
+
         function getMonthLabel(dateStr) {
             if (!dateStr) return '';
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return '';
-            return ['ΙΑΝ','ΦΕΒ','ΜΑΡ','ΑΠΡ','ΜΑΙ','ΙΟΥΝ','ΙΟΥΛ','ΑΥΓ','ΣΕΠ','ΟΚΤ','ΝΟΕ','ΔΕΚ'][d.getMonth()];
+            return MONTH_LABELS[d.getMonth()];
         }
-
         function getMonthNumber(label) {
-            return ['ΙΑΝ','ΦΕΒ','ΜΑΡ','ΑΠΡ','ΜΑΙ','ΙΟΥΝ','ΙΟΥΛ','ΑΥΓ','ΣΕΠ','ΟΚΤ','ΝΟΕ','ΔΕΚ'].indexOf(label);
+            return MONTH_LABELS.indexOf(label);
+        }
+        function getMonthFull(label) {
+            const i = getMonthNumber(label);
+            return i >= 0 ? MONTH_FULL[i] : label;
+        }
+        function getDaysInMonth(monthLabel, year) {
+            const m = getMonthNumber(monthLabel);
+            if (m < 0) return 31;
+            if (m === 1) {
+                return ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 29 : 28;
+            }
+            return MONTH_DAYS[m];
         }
 
         function computeDebt(list) {
@@ -610,48 +904,273 @@
             });
         }
 
-        function renderBalanceTable() {
-            const tbody = document.querySelector('#balanceTable tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const months = [...new Set(entries.map(e => e.month).filter(m => m))];
-            months.sort((a,b) => getMonthNumber(a) - getMonthNumber(b));
+        /* ============================================================
+           ΗΜΕΡΟΛΟΓΙΟ ΠΛΗΡΩΜΩΝ (ΑΝΑΛΥΣΗ)
+           ============================================================ */
+        function getCurrentMonthLabel() {
+            return MONTH_LABELS[new Date().getMonth()];
+        }
+
+        function renderCalendar() {
+            const selectorEl = document.getElementById('calendarMonthSelector');
+            const gridContainer = document.getElementById('calendarGridContainer');
+            if (!selectorEl || !gridContainer) return;
+
+            if (!calendarSelectedMonth) {
+                calendarSelectedMonth = getCurrentMonthLabel();
+            }
+
+            const monthsWithData = new Set(entries.map(e => e.month).filter(Boolean));
+
+            selectorEl.innerHTML = '';
+            MONTH_LABELS.forEach((m) => {
+                const btn = document.createElement('button');
+                btn.className = 'calendar-month-btn';
+                btn.textContent = m;
+                if (monthsWithData.has(m)) {
+                    btn.classList.add('has-data');
+                    btn.addEventListener('click', () => {
+                        calendarSelectedMonth = m;
+                        renderCalendar();
+                    });
+                } else {
+                    btn.disabled = true;
+                }
+                if (calendarSelectedMonth === m) btn.classList.add('active');
+                selectorEl.appendChild(btn);
+            });
+
+            if (!monthsWithData.has(calendarSelectedMonth)) {
+                const fallback = monthsWithData.has(getCurrentMonthLabel())
+                    ? getCurrentMonthLabel()
+                    : [...monthsWithData].sort((a,b) => getMonthNumber(b) - getMonthNumber(a))[0];
+                if (fallback) {
+                    calendarSelectedMonth = fallback;
+                    [...selectorEl.children].forEach(btn => {
+                        btn.classList.toggle('active', btn.textContent === calendarSelectedMonth);
+                    });
+                }
+            }
+
+            const monthEntries = entries.filter(e => e.month === calendarSelectedMonth);
+            const filtered = monthEntries.filter(e => e.amount > 0);
+
+            if (filtered.length === 0) {
+                gridContainer.innerHTML = `
+                    <div class="calendar-empty-msg">
+                        <i class="fas fa-calendar-times"></i>
+                        Δεν υπάρχουν πληρωμές για τον μήνα ${getMonthFull(calendarSelectedMonth)}
+                    </div>`;
+                return;
+            }
+
+            const categoriesWithData = [...new Set(filtered.map(e => e.category))]
+                .sort((a, b) => {
+                    const order = ['ΕΝΟΙΚΙΟ','ΔΕΗ','ΕΥΔΑΠ','NOVA','ΨΩΝΙΑ','ΨΥΧΑΓΩΓΙΑ','ΑΛΛΑ','ΜΙΣΘΟΣ','ΕΠΙΔΟΜΑ','ΜΕΤΑΦΟΡΑ'];
+                    return order.indexOf(a) - order.indexOf(b);
+                });
+
+            let year = new Date().getFullYear();
+            const firstDate = filtered.find(e => e.date)?.date;
+            if (firstDate) {
+                const y = parseInt(firstDate.slice(0, 4));
+                if (!isNaN(y)) year = y;
+            }
+            const daysInMonth = getDaysInMonth(calendarSelectedMonth, year);
+
+            const grid = document.createElement('div');
+            grid.className = 'calendar-grid';
+            grid.style.gridTemplateColumns = `130px repeat(${daysInMonth}, 34px)`;
+
+            const cornerCell = document.createElement('div');
+            cornerCell.className = 'calendar-cell empty-corner';
+            grid.appendChild(cornerCell);
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dh = document.createElement('div');
+                dh.className = 'calendar-cell day-header';
+                dh.textContent = d;
+                grid.appendChild(dh);
+            }
+
+            categoriesWithData.forEach(cat => {
+                const catHeader = document.createElement('div');
+                catHeader.className = 'calendar-cell category-header';
+                catHeader.textContent = `${getCategoryIcon(cat)} ${cat}`;
+                grid.appendChild(catHeader);
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dayStr = String(d).padStart(2, '0');
+                    const cellDate = `${year}-${String(getMonthNumber(calendarSelectedMonth)+1).padStart(2,'0')}-${dayStr}`;
+                    const cellEntries = filtered.filter(e => e.date === cellDate && e.category === cat);
+
+                    const cell = document.createElement('div');
+                    cell.className = 'calendar-cell';
+
+                    if (cellEntries.length > 0) {
+                        const plouCount = cellEntries.filter(e => e.person === 'Plou').length;
+                        const nikeloCount = cellEntries.filter(e => e.person === 'Nikelo').length;
+                        const totalAmount = cellEntries.reduce((s,e) => s + e.amount, 0);
+
+                        cell.classList.add('has-payment');
+                        cell.title = `${cellDate} — ${cat}\n${cellEntries.length} πληρωμές — ${totalAmount.toFixed(2)}€`;
+
+                        if (plouCount > 0) {
+                            const b = document.createElement('div');
+                            b.className = 'payment-bubble plou';
+                            b.textContent = plouCount;
+                            cell.appendChild(b);
+                        }
+                        if (nikeloCount > 0) {
+                            const b = document.createElement('div');
+                            b.className = 'payment-bubble nikelo';
+                            b.textContent = nikeloCount;
+                            cell.appendChild(b);
+                        }
+
+                        cell.addEventListener('click', () => {
+                            openDayDetailsModal(cellDate, cat, cellEntries);
+                        });
+                    }
+
+                    grid.appendChild(cell);
+                }
+            });
+
+            gridContainer.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'calendar-grid-wrapper';
+            wrapper.appendChild(grid);
+            gridContainer.appendChild(wrapper);
+        }
+
+        window.openDayDetailsModal = function(dateStr, category, cellEntries) {
+            const titleEl = document.getElementById('dayDetailsTitle');
+            const totalEl = document.getElementById('dayDetailsTotalText');
+            const listEl = document.getElementById('dayDetailsList');
+
+            const d = new Date(dateStr);
+            const dayNum = d.getDate();
+            const monthName = getMonthFull(calendarSelectedMonth);
+            const yearNum = d.getFullYear();
+
+            titleEl.textContent = `${dayNum} ${monthName} ${yearNum} — ${getCategoryIcon(category)} ${category}`;
+
+            const total = cellEntries.reduce((s,e) => s + e.amount, 0);
+            totalEl.textContent = `${cellEntries.length} πληρωμές — ${total.toFixed(2)}€`;
+
+            listEl.innerHTML = cellEntries.map(e => `
+                <div class="entry-row">
+                    <span class="er-date">${e.type}</span>
+                    <span class="er-cat">${getCategoryIcon(e.category)} ${e.category}</span>
+                    <span class="er-amount">${e.amount.toFixed(2)} €</span>
+                    <span class="er-person ${e.person === 'Plou' ? 'plou' : 'nikelo'}">${e.person}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('dayDetailsModal').style.display = 'flex';
+        };
+
+        window.closeDayDetailsModal = function() {
+            document.getElementById('dayDetailsModal').style.display = 'none';
+        };
+
+        /* ============================================================
+           ΙΣΟΖΥΓΙΟ: BUBBLE CARDS
+           ============================================================ */
+        function renderAnalysisGrid() {
+            const container = document.getElementById('fullBubbleGridContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const months = [...new Set(entries.map(e => e.month).filter(Boolean))]
+                .sort((a,b) => getMonthNumber(a) - getMonthNumber(b));
+
+            if (months.length === 0) {
+                container.innerHTML = `
+                    <div class="analysis-empty">
+                        <i class="fas fa-scale-balanced"></i>
+                        Δεν υπάρχουν δεδομένα για ισοζύγιο
+                    </div>`;
+                return;
+            }
+
             months.forEach(month => {
                 const me = entries.filter(e => e.month === month);
+                const total = me.reduce((s,e) => s + e.amount, 0);
                 const debt = computeDebt(me);
-                const plou = me.filter(e => e.person === 'Plou' && e.contribution === 'ΝΑΙ').reduce((a,b) => a + b.amount, 0);
-                const nikelo = me.filter(e => e.person === 'Nikelo' && e.contribution === 'ΝΑΙ').reduce((a,b) => a + b.amount, 0);
-                let debtText = 'ΚΑΝΕΙΣ', cls = '';
+
+                const plouTotal = me.filter(e => e.person === 'Plou').reduce((s,e) => s + e.amount, 0);
+                const nikeloTotal = me.filter(e => e.person === 'Nikelo').reduce((s,e) => s + e.amount, 0);
+
+                let debtText = 'ΚΑΝΕΝΑ ΧΡΕΟΣ';
+                let debtCls = 'none';
                 if (Math.abs(debt) > 0.01) {
-                    if (debt > 0) { debtText = `NIKELO: ${debt.toFixed(2)}€`; cls = 'debt-nikelo'; }
-                    else { debtText = `PLOU: ${Math.abs(debt).toFixed(2)}€`; cls = 'debt-plou'; }
+                    if (debt > 0) { debtText = `NIKELO: ${debt.toFixed(2)}€`; debtCls = 'nikelo'; }
+                    else { debtText = `PLOU: ${Math.abs(debt).toFixed(2)}€`; debtCls = 'plou'; }
                 }
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${month}</td><td>${plou.toFixed(2)} €</td><td>${nikelo.toFixed(2)} €</td><td class="${cls}">${debtText}</td>`;
-                tbody.appendChild(tr);
+
+                const card = document.createElement('div');
+                card.className = 'bubble-card';
+                card.innerHTML = `
+                    <h3>${getMonthFull(month)}</h3>
+                    <div class="bubble-count">${me.length} εγγραφές</div>
+
+                    <div class="bubble-split">
+                        <div class="bubble-person plou">
+                            <div class="bp-label">PLOU</div>
+                            <div class="bp-amount">${plouTotal.toFixed(2)} €</div>
+                        </div>
+                        <div class="bubble-person nikelo">
+                            <div class="bp-label">NIKELO</div>
+                            <div class="bp-amount">${nikeloTotal.toFixed(2)} €</div>
+                        </div>
+                    </div>
+
+                    <div class="bubble-total-line">
+                        <span>ΣΥΝΟΛΟ</span>
+                        <span class="btl-value">${total.toFixed(2)} €</span>
+                    </div>
+
+                    <div class="bubble-debt ${debtCls}">${debtText}</div>
+                `;
+                card.addEventListener('click', () => openEntriesModal(month, null));
+                container.appendChild(card);
             });
         }
 
-        function renderCategorySummary() {
-            const tbody = document.querySelector('#categorySummaryTable tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const byCat = {};
-            entries.forEach(e => {
-                if (!byCat[e.category]) byCat[e.category] = { count:0, plou:0, nikelo:0 };
-                byCat[e.category].count++;
-                if (e.person === 'Plou') byCat[e.category].plou += e.amount;
-                else byCat[e.category].nikelo += e.amount;
-            });
-            Object.keys(byCat).sort().forEach(cat => {
-                const row = byCat[cat];
-                const catEntries = entries.filter(e => e.category === cat && e.contribution === 'ΝΑΙ');
-                const net = computeDebt(catEntries);
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${getCategoryIcon(cat)} ${cat}</td><td>${row.count}</td><td>${row.plou.toFixed(2)} €</td><td>${row.nikelo.toFixed(2)} €</td><td>${net.toFixed(2)} €</td>`;
-                tbody.appendChild(tr);
-            });
-        }
+        /* ====== ENTRIES DETAILS MODAL (για κάρτες Ισοζυγίου) ====== */
+        window.openEntriesModal = function(month, category) {
+            const list = document.getElementById('entriesList');
+            const title = document.getElementById('entriesTitle');
+            const totalText = document.getElementById('entriesTotalText');
+
+            let filtered = entries.filter(e =>
+                (!month || e.month === month) &&
+                (!category || e.category === category)
+            );
+
+            const label = month ? getMonthFull(month) : 'ΟΛΑ';
+            title.textContent = category ? `${label} — ${getCategoryIcon(category)} ${category}` : label;
+
+            const sum = filtered.reduce((s,e) => s + e.amount, 0);
+            totalText.textContent = `${filtered.length} καταχωρήσεις - ${sum.toFixed(2)}€`;
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div style="text-align:center;color:var(--text-dim);padding:15px;">Καμία εγγραφή</div>`;
+            } else {
+                list.innerHTML = filtered.map(e => `
+                    <div class="entry-row">
+                        <span class="er-date">${e.date}</span>
+                        <span class="er-cat">${getCategoryIcon(e.category)} ${e.category}</span>
+                        <span class="er-amount">${e.amount.toFixed(2)} €</span>
+                        <span class="er-person ${e.person === 'Plou' ? 'plou' : 'nikelo'}">${e.person}</span>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('entriesDetailsModal').style.display = 'flex';
+        };
 
         function updateFloatingDebt() {
             const debt = computeDebt(entries);
@@ -670,8 +1189,8 @@
         function renderAll() {
             renderBaseTable();
             renderMobileCards();
-            renderBalanceTable();
-            renderCategorySummary();
+            renderAnalysisGrid();   /* κάρτες ισοζυγίου */
+            renderCalendar();       /* ημερολόγιο */
             updateFloatingDebt();
         }
 
@@ -694,16 +1213,8 @@
             const tabEl = document.getElementById(tabMap[targetId]);
             if (tabEl) { tabEl.classList.remove('tab-purple'); tabEl.classList.add('tab-cyan'); }
             if (targetId === 'base') { renderBaseTable(); renderMobileCards(); }
-            if (targetId === 'balance') { renderBalanceTable(); renderCategorySummary(); }
-            if (targetId === 'analysis') {
-                const container = document.getElementById('fullBubbleGridContainer');
-                if (container) {
-                    container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-dim);">
-                        <i class="fas fa-chart-pie" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-                        Πλέγμα ανάλυσης<br><small>${entries.length} καταχωρήσεις</small>
-                    </div>`;
-                }
-            }
+            if (targetId === 'balance') { renderAnalysisGrid(); }
+            if (targetId === 'analysis') { renderCalendar(); }
         }
 
         window.closeModal = function() { document.getElementById('entryModal').style.display = 'none'; };
@@ -711,9 +1222,46 @@
             document.getElementById('allEntriesModal').style.display = 'none';
             selectedEntries.clear();
             document.getElementById('selectedCount').textContent = '0';
+            document.getElementById('selectAllCheckbox').checked = false;
         };
-        window.closeEntriesModal = function() { document.getElementById('entriesDetailsModal').style.display = 'none'; };
-        window.goBackToGrid = function() { closeEntriesModal(); activateTab('analysis'); };
+        window.closeEntriesModal = function() {
+            document.getElementById('entriesDetailsModal').style.display = 'none';
+        };
+        window.goBackToGrid = function() {
+            closeEntriesModal();
+            activateTab('balance');
+        };
+
+        /* ====== ALL ENTRIES MODAL ====== */
+        function buildMonthSelector() {
+            const container = document.getElementById('allEntriesMonthSelector');
+            if (!container) return;
+            const months = [...new Set(entries.map(e => e.month).filter(Boolean))]
+                .sort((a,b) => getMonthNumber(a) - getMonthNumber(b));
+
+            container.innerHTML = `<button class="calendar-month-btn has-data active" data-month="all">ΌΛΑ</button>`;
+            months.forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = 'calendar-month-btn has-data';
+                btn.dataset.month = m;
+                btn.textContent = m;
+                container.appendChild(btn);
+            });
+
+            container.querySelectorAll('.calendar-month-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    container.querySelectorAll('.calendar-month-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    modalCurrentFilter = this.dataset.month;
+                    modalCurrentLimit = 10;
+                    selectedEntries.clear();
+                    document.getElementById('selectedCount').textContent = '0';
+                    document.getElementById('deleteSelectedBtn').disabled = true;
+                    document.getElementById('selectAllCheckbox').checked = false;
+                    renderModalTable();
+                });
+            });
+        }
 
         function renderModalTable() {
             const tbody = document.querySelector('#allEntriesTable tbody');
@@ -721,17 +1269,19 @@
             const loadBtn = document.getElementById('modalLoadMoreBtn');
             if (!tbody || !info) return;
             tbody.innerHTML = '';
-            let filtered = modalCurrentFilter === 'all' ? [...entries] : entries.filter(e => e.month === modalCurrentFilter);
+
+            const indexed = entries.map((e, i) => ({ ...e, _idx: i }));
+            let filtered = modalCurrentFilter === 'all'
+                ? indexed
+                : indexed.filter(e => e.month === modalCurrentFilter);
             filtered = filtered.reverse();
+
             const toShow = filtered.slice(0, modalCurrentLimit);
-            toShow.forEach((e, index) => {
-                const originalIndex = entries.length - 1 - [...entries].reverse().findIndex(entry =>
-                    entry.date === e.date && entry.category === e.category && entry.amount === e.amount && entry.person === e.person
-                );
+            toShow.forEach(e => {
+                const checked = selectedEntries.has(e._idx) ? 'checked' : '';
                 const tr = document.createElement('tr');
-                const checked = selectedEntries.has(originalIndex) ? 'checked' : '';
                 tr.innerHTML = `
-                    <td><input type="checkbox" data-index="${originalIndex}" ${checked}></td>
+                    <td><input type="checkbox" data-index="${e._idx}" ${checked}></td>
                     <td>${e.date}</td><td>${e.month||''}</td>
                     <td>${getCategoryIcon(e.category)} ${e.category}</td>
                     <td>${e.type}</td><td>${e.amount.toFixed(2)} €</td>
@@ -739,12 +1289,14 @@
                 `;
                 tbody.appendChild(tr);
             });
+
             const showing = Math.min(modalCurrentLimit, filtered.length);
             info.textContent = `Εμφάνιση ${showing} από ${filtered.length} εγγραφές`;
             if (loadBtn) {
-                loadBtn.style.display = modalCurrentLimit < filtered.length ? 'block' : 'none';
+                loadBtn.style.display = modalCurrentLimit < filtered.length ? 'inline-block' : 'none';
                 loadBtn.disabled = modalCurrentLimit >= filtered.length;
             }
+
             tbody.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                 cb.addEventListener('change', function() {
                     const idx = parseInt(this.dataset.index);
@@ -767,22 +1319,115 @@
             selectedEntries.clear();
             document.getElementById('selectedCount').textContent = '0';
             document.getElementById('deleteSelectedBtn').disabled = true;
+            document.getElementById('selectAllCheckbox').checked = false;
+            buildMonthSelector();
             renderModalTable();
             document.getElementById('allEntriesModal').style.display = 'flex';
         }
 
-        // ============================================================
-        // INIT - DOMContentLoaded
-        // ============================================================
+        /* ============================================================
+           IMPORT (JSON + XLSX)
+           ============================================================ */
+        function normalizeEntry(raw) {
+            const dateRaw = raw.date || raw.ΗΜΕΡΟΜΗΝΙΑ || raw.Date || '';
+            let dateStr = '';
+            if (dateRaw) {
+                if (typeof dateRaw === 'string') {
+                    if (/^\d{4}-\d{2}-\d{2}/.test(dateRaw)) {
+                        dateStr = dateRaw.slice(0, 10);
+                    } else if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(dateRaw)) {
+                        const [d,m,y] = dateRaw.split('/');
+                        dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    } else {
+                        const parsed = new Date(dateRaw);
+                        if (!isNaN(parsed.getTime())) dateStr = parsed.toISOString().slice(0,10);
+                    }
+                } else if (dateRaw instanceof Date) {
+                    dateStr = dateRaw.toISOString().slice(0,10);
+                }
+            }
+            return {
+                date: dateStr,
+                month: raw.month || raw.ΜΗΝΑΣ || getMonthLabel(dateStr),
+                category: raw.category || raw.ΚΑΤΗΓΟΡΙΑ || 'ΑΛΛΑ',
+                type: raw.type || raw.ΤΥΠΟΣ || 'ΕΞΟΔΑ',
+                amount: parseFloat(raw.amount ?? raw.ΠΟΣΟ ?? 0) || 0,
+                person: raw.person || raw.ΠΟΙΟΣ || 'Plou',
+                contribution: raw.contribution || raw.ΣΥΝΕΙΣΦΟΡΑ || 'ΝΑΙ'
+            };
+        }
+
+        function applyImportedEntries(list, sourceLabel) {
+            const cleaned = list
+                .map(normalizeEntry)
+                .filter(e => e.date && e.amount > 0);
+            if (cleaned.length === 0) {
+                alert('⚠️ Δεν βρέθηκαν έγκυρες εγγραφές στο αρχείο.');
+                return;
+            }
+            entries = cleaned;
+            saveData(entries);
+            renderAll();
+            alert(`✅ Εισήχθησαν ${entries.length} εγγραφές (${sourceLabel})`);
+        }
+
+        function handleJsonImport(text) {
+            let clean = text.replace(/^\uFEFF/, '').trim();
+            const data = JSON.parse(clean);
+            const list = Array.isArray(data) ? data : (data.entries || []);
+            if (!Array.isArray(list)) throw new Error('Μη έγκυρη δομή JSON (αναμένεται array ή {entries:[...]})');
+            applyImportedEntries(list, 'JSON');
+        }
+
+        function handleExcelImport(arrayBuffer) {
+            const wb = XLSX.read(arrayBuffer, { type: 'array' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
+            if (!rows || rows.length < 2) throw new Error('Το φύλλο Excel είναι κενό ή χωρίς δεδομένα');
+
+            const header = rows[0].map(h => String(h).trim().toLowerCase());
+            const findCol = (keywords) => header.findIndex(h =>
+                keywords.some(k => h.includes(k.toLowerCase()))
+            );
+            const iDate = findCol(['ημερ','date']);
+            const iMonth = findCol(['μην','month']);
+            const iCat = findCol(['κατηγ','categ']);
+            const iType = findCol(['τυπο','type']);
+            const iAmt = findCol(['ποσ','amount','ποσό']);
+            const iPer = findCol(['ποι','person','άτομο','ατομο']);
+            const iCon = findCol(['συνεισ','contrib']);
+
+            if (iDate === -1 || iAmt === -1) {
+                throw new Error('Δεν βρέθηκαν στήλες ΗΜΕΡΟΜΗΝΙΑ / ΠΟΣΟ στο Excel.');
+            }
+
+            const list = [];
+            for (let i = 1; i < rows.length; i++) {
+                const r = rows[i];
+                if (!r || r.every(c => c === '')) continue;
+                list.push({
+                    date: r[iDate],
+                    month: iMonth >= 0 ? r[iMonth] : '',
+                    category: iCat >= 0 ? r[iCat] : 'ΑΛΛΑ',
+                    type: iType >= 0 ? r[iType] : 'ΕΞΟΔΑ',
+                    amount: r[iAmt],
+                    person: iPer >= 0 ? r[iPer] : 'Plou',
+                    contribution: iCon >= 0 ? r[iCon] : 'ΝΑΙ'
+                });
+            }
+            applyImportedEntries(list, 'Excel');
+        }
+
+        /* ============================================================
+           INIT
+           ============================================================ */
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Budget Manager started');
 
-            // Tabs
             document.getElementById('tabBase').addEventListener('click', () => activateTab('base'));
             document.getElementById('tabBalance').addEventListener('click', () => activateTab('balance'));
             document.getElementById('tabAnalysis').addEventListener('click', () => activateTab('analysis'));
 
-            // Add Entry
             document.getElementById('addEntryBtn').addEventListener('click', function() {
                 document.getElementById('entryDate').valueAsDate = new Date();
                 document.getElementById('entryAmount').value = '';
@@ -793,12 +1438,13 @@
                 document.getElementById('entryModal').style.display = 'flex';
             });
 
-            // Close modal on background click
             document.getElementById('entryModal').addEventListener('click', function(e) {
                 if (e.target === this) closeModal();
             });
+            document.getElementById('dayDetailsModal').addEventListener('click', function(e) {
+                if (e.target === this) closeDayDetailsModal();
+            });
 
-            // Type change - lock contribution
             document.getElementById('entryType').addEventListener('change', function() {
                 const contrib = document.getElementById('entryContribution');
                 const msg = document.getElementById('incomeLockMessage');
@@ -813,7 +1459,6 @@
                 }
             });
 
-            // Save Entry
             document.getElementById('saveEntry').addEventListener('click', function() {
                 const date = document.getElementById('entryDate').value;
                 const category = document.getElementById('entryCategory').value;
@@ -833,16 +1478,10 @@
                 renderAll();
             });
 
-            // Show all entries
             document.getElementById('showAllEntriesBtn').addEventListener('click', openAllEntriesModal);
-
-            // Close all entries modal
             document.querySelector('.all-entries-modal .btn-primary')?.addEventListener('click', closeAllEntriesModal);
-
-            // Load more in modal
             document.getElementById('modalLoadMoreBtn').addEventListener('click', loadMoreInModal);
 
-            // Select all
             document.getElementById('selectAllCheckbox').addEventListener('change', function() {
                 const tbody = document.querySelector('#allEntriesTable tbody');
                 if (!tbody) return;
@@ -856,7 +1495,6 @@
                 document.getElementById('deleteSelectedBtn').disabled = selectedEntries.size === 0;
             });
 
-            // Delete selected
             document.getElementById('deleteSelectedBtn').addEventListener('click', function() {
                 if (selectedEntries.size === 0) return;
                 if (!confirm(`🚨 ΔΙΑΓΡΑΦΗ ${selectedEntries.size} ΕΓΓΡΑΦΩΝ\n\nΑυτή η ενέργεια ΔΕΝ μπορεί να αναιρεθεί!\n\nΣΙΓΟΥΡΑ;`)) return;
@@ -867,18 +1505,17 @@
                 selectedEntries.clear();
                 document.getElementById('selectedCount').textContent = '0';
                 document.getElementById('deleteSelectedBtn').disabled = true;
+                document.getElementById('selectAllCheckbox').checked = false;
                 renderAll();
                 renderModalTable();
                 alert(`✅ Διαγράφηκαν ${indices.length} εγγραφές`);
             });
 
-            // Backup
             document.getElementById('backupBtn').addEventListener('click', function() {
                 if (entries.length === 0) { alert('Δεν υπάρχουν δεδομένα!'); return; }
                 createBackup();
             });
 
-            // Restore
             document.getElementById('restoreBtn').addEventListener('click', function() {
                 const backup = loadBackup();
                 if (!backup) { alert('Δεν υπάρχει αποθηκευμένη κατάσταση!'); return; }
@@ -889,7 +1526,6 @@
                 alert(`✅ Επαναφέρθηκαν ${entries.length} εγγραφές`);
             });
 
-            // Export
             document.getElementById('exportBtn').addEventListener('click', function() {
                 if (entries.length === 0) { alert('Δεν υπάρχουν δεδομένα!'); return; }
                 const now = new Date();
@@ -903,32 +1539,58 @@
                 URL.revokeObjectURL(url);
             });
 
-            // Import
             document.getElementById('importBtn').addEventListener('click', function() {
-                if (entries.length > 0 && !confirm('Εισαγωγή θα αντικαταστήσει τα τρέχοντα δεδομένα. Συνέχεια;')) return;
+                if (entries.length > 0) {
+                    const ok = confirm(
+                        `⚠️ Η εισαγωγή ΘΑ ΑΝΤΙΚΑΤΑΣΤΗΣΕΙ τα ${entries.length} υπάρχοντα δεδομένα.\n\n` +
+                        `Συνέχεια;`
+                    );
+                    if (!ok) return;
+                }
                 document.getElementById('fileInput').click();
             });
 
             document.getElementById('fileInput').addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    try {
-                        const data = JSON.parse(evt.target.result);
-                        entries = data.entries || data;
-                        saveData(entries);
-                        renderAll();
-                        alert(`✅ Εισήχθησαν ${entries.length} εγγραφές`);
-                    } catch(err) {
-                        alert('Σφάλμα εισαγωγής: ' + err.message);
-                    }
-                };
-                reader.readAsText(file);
+
+                const ext = (file.name.split('.').pop() || '').toLowerCase();
+                console.log('📥 Importing:', file.name, '| ext:', ext, '| size:', file.size);
+
+                if (ext === 'json' || file.type === 'application/json') {
+                    const reader = new FileReader();
+                    reader.onerror = () => alert('❌ Σφάλμα ανάγνωσης αρχείου');
+                    reader.onload = function(evt) {
+                        try {
+                            console.log('📥 Raw (first 200):', String(evt.target.result).slice(0, 200));
+                            handleJsonImport(String(evt.target.result));
+                        } catch(err) {
+                            console.error('JSON import error:', err);
+                            alert('❌ Σφάλμα JSON: ' + err.message);
+                        }
+                    };
+                    reader.readAsText(file, 'UTF-8');
+                }
+                else if (ext === 'xlsx' || ext === 'xls') {
+                    const reader = new FileReader();
+                    reader.onerror = () => alert('❌ Σφάλμα ανάγνωσης αρχείου');
+                    reader.onload = function(evt) {
+                        try {
+                            handleExcelImport(evt.target.result);
+                        } catch(err) {
+                            console.error('Excel import error:', err);
+                            alert('❌ Σφάλμα Excel: ' + err.message);
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+                else {
+                    alert('⚠️ Μη υποστηριζόμενος τύπος αρχείου. Δέξου .json, .xlsx ή .xls');
+                }
+
                 this.value = '';
             });
 
-            // Digital Clock
             function updateClock() {
                 const now = new Date();
                 const weekdays = ['Κυριακή','Δευτέρα','Τρίτη','Τετάρτη','Πέμπτη','Παρασκευή','Σάββατο'];
@@ -950,7 +1612,6 @@
             updateClock();
             setInterval(updateClock, 1000);
 
-            // Initial render
             activateTab('base');
             renderAll();
             console.log('✅ Budget Manager ready -', entries.length, 'entries');
