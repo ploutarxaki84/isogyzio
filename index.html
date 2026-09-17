@@ -212,7 +212,6 @@
             justify-content: center;
             align-items: stretch;
         }
-        /* Όταν υπάρχουν 2 κάρτες (μήνας + σύνολο) */
         .balance-grid.two-cards {
             grid-template-columns: repeat(2, minmax(220px, 1fr));
         }
@@ -238,7 +237,6 @@
             transform: translateY(-4px) scale(1.03);
         }
 
-        /* Η "συνολική" κάρτα ξεχωρίζει ελαφρώς */
         .bubble-card.total-card {
             background: linear-gradient(135deg, rgba(61,232,255,0.15), rgba(127,90,240,0.10));
             border-color: var(--neon-cyan);
@@ -546,7 +544,6 @@
             .day-details-modal-content { padding:15px; }
             .month-filter { flex-direction:column; }
             .month-filter-btn { width:100%; }
-            /* Mobile: οι 2 κάρτες γίνονται 1 στήλη */
             .balance-grid.two-cards {
                 grid-template-columns: 1fr;
             }
@@ -939,6 +936,7 @@
 
         /* ============================================================
            ΗΜΕΡΟΛΟΓΙΟ ΠΛΗΡΩΜΩΝ (ΑΝΑΛΥΣΗ)
+           Δείχνει ΜΟΝΟ τις μέρες που έχουν πληρωμή
            ============================================================ */
         function getCurrentMonthLabel() {
             return MONTH_LABELS[new Date().getMonth()];
@@ -997,45 +995,61 @@
                 return;
             }
 
+            // Κατηγορίες με δεδομένα (σειρά όπως στο dropdown)
             const categoriesWithData = [...new Set(filtered.map(e => e.category))]
                 .sort((a, b) => {
                     const order = ['ΕΝΟΙΚΙΟ','ΔΕΗ','ΕΥΔΑΠ','NOVA','ΨΩΝΙΑ','ΨΥΧΑΓΩΓΙΑ','ΑΛΛΑ','ΜΙΣΘΟΣ','ΕΠΙΔΟΜΑ','ΜΕΤΑΦΟΡΑ'];
                     return order.indexOf(a) - order.indexOf(b);
                 });
 
-            let year = new Date().getFullYear();
-            const firstDate = filtered.find(e => e.date)?.date;
-            if (firstDate) {
-                const y = parseInt(firstDate.slice(0, 4));
-                if (!isNaN(y)) year = y;
-            }
-            const daysInMonth = getDaysInMonth(calendarSelectedMonth, year);
+            // ✅ ΝΕΟ: Μόνο οι μέρες που έχουν έστω 1 πληρωμή (σε οποιαδήποτε κατηγορία)
+            const daysWithPayments = [...new Set(
+                filtered
+                    .map(e => parseInt(e.date.slice(8, 10), 10))
+                    .filter(d => !isNaN(d))
+            )].sort((a, b) => a - b);
 
+            if (daysWithPayments.length === 0) {
+                gridContainer.innerHTML = `
+                    <div class="calendar-empty-msg">
+                        <i class="fas fa-calendar-times"></i>
+                        Δεν υπάρχουν έγκυρες ημερομηνίες για τον μήνα ${getMonthFull(calendarSelectedMonth)}
+                    </div>`;
+                return;
+            }
+
+            const numCols = daysWithPayments.length;
             const grid = document.createElement('div');
             grid.className = 'calendar-grid';
-            grid.style.gridTemplateColumns = `130px repeat(${daysInMonth}, 34px)`;
+            grid.style.gridTemplateColumns = `130px repeat(${numCols}, 34px)`;
 
+            // Γωνιακό κελί
             const cornerCell = document.createElement('div');
             cornerCell.className = 'calendar-cell empty-corner';
             grid.appendChild(cornerCell);
 
-            for (let d = 1; d <= daysInMonth; d++) {
+            // Headers: μόνο οι μέρες που έχουν πληρωμή
+            daysWithPayments.forEach(d => {
                 const dh = document.createElement('div');
                 dh.className = 'calendar-cell day-header';
                 dh.textContent = d;
                 grid.appendChild(dh);
-            }
+            });
 
+            // Για κάθε κατηγορία
             categoriesWithData.forEach(cat => {
                 const catHeader = document.createElement('div');
                 catHeader.className = 'calendar-cell category-header';
                 catHeader.textContent = `${getCategoryIcon(cat)} ${cat}`;
                 grid.appendChild(catHeader);
 
-                for (let d = 1; d <= daysInMonth; d++) {
+                daysWithPayments.forEach(d => {
                     const dayStr = String(d).padStart(2, '0');
-                    const cellDate = `${year}-${String(getMonthNumber(calendarSelectedMonth)+1).padStart(2,'0')}-${dayStr}`;
-                    const cellEntries = filtered.filter(e => e.date === cellDate && e.category === cat);
+                    // Το cellDate: βρίσκουμε έτος + μήνα από τα entries
+                    const cellEntries = filtered.filter(e => {
+                        const ed = parseInt(e.date.slice(8, 10), 10);
+                        return ed === d && e.category === cat;
+                    });
 
                     const cell = document.createElement('div');
                     cell.className = 'calendar-cell';
@@ -1044,9 +1058,10 @@
                         const plouCount = cellEntries.filter(e => e.person === 'Plou').length;
                         const nikeloCount = cellEntries.filter(e => e.person === 'Nikelo').length;
                         const totalAmount = cellEntries.reduce((s,e) => s + e.amount, 0);
+                        const sampleDate = cellEntries[0].date;
 
                         cell.classList.add('has-payment');
-                        cell.title = `${cellDate} — ${cat}\n${cellEntries.length} πληρωμές — ${totalAmount.toFixed(2)}€`;
+                        cell.title = `${sampleDate} — ${cat}\n${cellEntries.length} πληρωμές — ${totalAmount.toFixed(2)}€`;
 
                         if (plouCount > 0) {
                             const b = document.createElement('div');
@@ -1062,12 +1077,12 @@
                         }
 
                         cell.addEventListener('click', () => {
-                            openDayDetailsModal(cellDate, cat, cellEntries);
+                            openDayDetailsModal(sampleDate, cat, cellEntries);
                         });
                     }
 
                     grid.appendChild(cell);
-                }
+                });
             });
 
             gridContainer.innerHTML = '';
@@ -1153,7 +1168,7 @@
             }
         }
 
-        function buildBubbleCardHTML(title, entriesList, extraTitleClass) {
+        function buildBubbleCardHTML(title, entriesList) {
             const total = entriesList.reduce((s,e) => s + e.amount, 0);
             const debt = computeDebt(entriesList);
             const plouTotal = entriesList.filter(e => e.person === 'Plou').reduce((s,e) => s + e.amount, 0);
@@ -1223,23 +1238,18 @@
 
             const selectedIdx = getMonthNumber(balanceSelectedMonth);
 
-            // 1) Τρέχων επιλεγμένος μήνας
             const monthEntries = entries.filter(e => e.month === balanceSelectedMonth);
-
-            // 2) Σωρευτικό σύνολο: όλοι οι μήνες από ΙΑΝ μέχρι και τον επιλεγμένο
             const cumulativeEntries = entries.filter(e => {
                 const mi = getMonthNumber(e.month);
                 return mi >= 0 && mi <= selectedIdx;
             });
 
-            // Κάρτα 1: Τρέχων μήνας
             const cardMonth = document.createElement('div');
             cardMonth.className = 'bubble-card';
             cardMonth.innerHTML = buildBubbleCardHTML(getMonthFull(balanceSelectedMonth), monthEntries);
             cardMonth.addEventListener('click', () => openEntriesModal(balanceSelectedMonth, null));
             container.appendChild(cardMonth);
 
-            // Κάρτα 2: Σύνολο μηνών/έτους (σωρευτικό μέχρι τον επιλεγμένο)
             const cardTotal = document.createElement('div');
             cardTotal.className = 'bubble-card total-card';
             cardTotal.innerHTML = buildBubbleCardHTML('ΣΥΝΟΛΟ ΜΗΝΩΝ / ΕΤΟΥΣ', cumulativeEntries);
@@ -1250,7 +1260,6 @@
         }
 
         /* ====== ENTRIES DETAILS MODAL ====== */
-        /* isCumulative: αν true, φιλτράρει σωρευτικά μέχρι maxMonthIdx */
         window.openEntriesModal = function(month, category, isCumulative, maxMonthIdx) {
             const list = document.getElementById('entriesList');
             const title = document.getElementById('entriesTitle');
