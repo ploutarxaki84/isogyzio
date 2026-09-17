@@ -206,9 +206,10 @@
         /* ====== BUBBLE CARDS (ΙΣΟΖΥΓΙΟ) ====== */
         .full-bubble-grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 15px;
             padding: 5px;
+            justify-content: center;
         }
         .bubble-card {
             background: linear-gradient(135deg, rgba(127,90,240,0.15), rgba(61,232,255,0.08));
@@ -518,7 +519,7 @@
             .day-details-modal-content { padding:15px; }
             .month-filter { flex-direction:column; }
             .month-filter-btn { width:100%; }
-            .full-bubble-grid-container { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .full-bubble-grid-container { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
             .entry-row { grid-template-columns: 80px 1fr auto; font-size: 0.72rem; }
             .entry-row .er-person { display: none; }
             .calendar-cell { min-width: 30px; height: 30px; }
@@ -677,6 +678,7 @@
         <section id="balance" class="tab-content">
             <div class="table-card">
                 <h2><i class="fas fa-scale-balanced"></i> ΙΣΟΖΥΓΙΟ ΑΝΑ ΜΗΝΑ</h2>
+                <div class="calendar-month-selector" id="balanceMonthSelector"></div>
                 <div class="full-bubble-grid-container" id="fullBubbleGridContainer"></div>
             </div>
         </section>
@@ -778,6 +780,7 @@
         let modalCurrentLimit = 10;
         let modalCurrentFilter = 'all';
         let calendarSelectedMonth = null;
+        let balanceSelectedMonth = null;   /* ΝΕΟ: επιλεγμένος μήνας στο Ισοζύγιο */
 
         function getCategoryIcon(cat) {
             const icons = {
@@ -1076,17 +1079,62 @@
         };
 
         /* ============================================================
-           ΙΣΟΖΥΓΙΟ: BUBBLE CARDS
+           ΙΣΟΖΥΓΙΟ: BUBBLE CARDS (με month selector)
            ============================================================ */
+        function renderBalanceSelector() {
+            const selectorEl = document.getElementById('balanceMonthSelector');
+            if (!selectorEl) return;
+
+            if (!balanceSelectedMonth) {
+                balanceSelectedMonth = getCurrentMonthLabel();
+            }
+
+            const monthsWithData = new Set(entries.map(e => e.month).filter(Boolean));
+
+            selectorEl.innerHTML = '';
+            MONTH_LABELS.forEach((m) => {
+                const btn = document.createElement('button');
+                btn.className = 'calendar-month-btn';
+                btn.textContent = m;
+                if (monthsWithData.has(m)) {
+                    btn.classList.add('has-data');
+                    btn.addEventListener('click', () => {
+                        balanceSelectedMonth = m;
+                        renderAnalysisGrid();
+                        renderBalanceSelector();
+                    });
+                } else {
+                    btn.disabled = true;
+                }
+                if (balanceSelectedMonth === m) btn.classList.add('active');
+                selectorEl.appendChild(btn);
+            });
+
+            if (!monthsWithData.has(balanceSelectedMonth)) {
+                const fallback = monthsWithData.has(getCurrentMonthLabel())
+                    ? getCurrentMonthLabel()
+                    : [...monthsWithData].sort((a,b) => getMonthNumber(b) - getMonthNumber(a))[0];
+                if (fallback) {
+                    balanceSelectedMonth = fallback;
+                    [...selectorEl.children].forEach(btn => {
+                        btn.classList.toggle('active', btn.textContent === balanceSelectedMonth);
+                    });
+                }
+            }
+        }
+
         function renderAnalysisGrid() {
             const container = document.getElementById('fullBubbleGridContainer');
             if (!container) return;
             container.innerHTML = '';
 
-            const months = [...new Set(entries.map(e => e.month).filter(Boolean))]
-                .sort((a,b) => getMonthNumber(a) - getMonthNumber(b));
+            if (!balanceSelectedMonth) {
+                balanceSelectedMonth = getCurrentMonthLabel();
+            }
 
-            if (months.length === 0) {
+            const monthsWithData = [...new Set(entries.map(e => e.month).filter(Boolean))];
+
+            if (monthsWithData.length === 0) {
                 container.innerHTML = `
                     <div class="analysis-empty">
                         <i class="fas fa-scale-balanced"></i>
@@ -1095,48 +1143,57 @@
                 return;
             }
 
-            months.forEach(month => {
-                const me = entries.filter(e => e.month === month);
-                const total = me.reduce((s,e) => s + e.amount, 0);
-                const debt = computeDebt(me);
+            // Δείχνουμε μόνο τον επιλεγμένο μήνα
+            if (!monthsWithData.includes(balanceSelectedMonth)) {
+                container.innerHTML = `
+                    <div class="analysis-empty">
+                        <i class="fas fa-calendar-times"></i>
+                        Δεν υπάρχουν δεδομένα για τον μήνα ${getMonthFull(balanceSelectedMonth)}
+                    </div>`;
+                return;
+            }
 
-                const plouTotal = me.filter(e => e.person === 'Plou').reduce((s,e) => s + e.amount, 0);
-                const nikeloTotal = me.filter(e => e.person === 'Nikelo').reduce((s,e) => s + e.amount, 0);
+            const month = balanceSelectedMonth;
+            const me = entries.filter(e => e.month === month);
+            const total = me.reduce((s,e) => s + e.amount, 0);
+            const debt = computeDebt(me);
 
-                let debtText = 'ΚΑΝΕΝΑ ΧΡΕΟΣ';
-                let debtCls = 'none';
-                if (Math.abs(debt) > 0.01) {
-                    if (debt > 0) { debtText = `NIKELO: ${debt.toFixed(2)}€`; debtCls = 'nikelo'; }
-                    else { debtText = `PLOU: ${Math.abs(debt).toFixed(2)}€`; debtCls = 'plou'; }
-                }
+            const plouTotal = me.filter(e => e.person === 'Plou').reduce((s,e) => s + e.amount, 0);
+            const nikeloTotal = me.filter(e => e.person === 'Nikelo').reduce((s,e) => s + e.amount, 0);
 
-                const card = document.createElement('div');
-                card.className = 'bubble-card';
-                card.innerHTML = `
-                    <h3>${getMonthFull(month)}</h3>
-                    <div class="bubble-count">${me.length} εγγραφές</div>
+            let debtText = 'ΚΑΝΕΝΑ ΧΡΕΟΣ';
+            let debtCls = 'none';
+            if (Math.abs(debt) > 0.01) {
+                if (debt > 0) { debtText = `NIKELO: ${debt.toFixed(2)}€`; debtCls = 'nikelo'; }
+                else { debtText = `PLOU: ${Math.abs(debt).toFixed(2)}€`; debtCls = 'plou'; }
+            }
 
-                    <div class="bubble-split">
-                        <div class="bubble-person plou">
-                            <div class="bp-label">PLOU</div>
-                            <div class="bp-amount">${plouTotal.toFixed(2)} €</div>
-                        </div>
-                        <div class="bubble-person nikelo">
-                            <div class="bp-label">NIKELO</div>
-                            <div class="bp-amount">${nikeloTotal.toFixed(2)} €</div>
-                        </div>
+            const card = document.createElement('div');
+            card.className = 'bubble-card';
+            card.innerHTML = `
+                <h3>${getMonthFull(month)}</h3>
+                <div class="bubble-count">${me.length} εγγραφές</div>
+
+                <div class="bubble-split">
+                    <div class="bubble-person plou">
+                        <div class="bp-label">PLOU</div>
+                        <div class="bp-amount">${plouTotal.toFixed(2)} €</div>
                     </div>
-
-                    <div class="bubble-total-line">
-                        <span>ΣΥΝΟΛΟ</span>
-                        <span class="btl-value">${total.toFixed(2)} €</span>
+                    <div class="bubble-person nikelo">
+                        <div class="bp-label">NIKELO</div>
+                        <div class="bp-amount">${nikeloTotal.toFixed(2)} €</div>
                     </div>
+                </div>
 
-                    <div class="bubble-debt ${debtCls}">${debtText}</div>
-                `;
-                card.addEventListener('click', () => openEntriesModal(month, null));
-                container.appendChild(card);
-            });
+                <div class="bubble-total-line">
+                    <span>ΣΥΝΟΛΟ</span>
+                    <span class="btl-value">${total.toFixed(2)} €</span>
+                </div>
+
+                <div class="bubble-debt ${debtCls}">${debtText}</div>
+            `;
+            card.addEventListener('click', () => openEntriesModal(month, null));
+            container.appendChild(card);
         }
 
         /* ====== ENTRIES DETAILS MODAL (για κάρτες Ισοζυγίου) ====== */
@@ -1189,8 +1246,9 @@
         function renderAll() {
             renderBaseTable();
             renderMobileCards();
-            renderAnalysisGrid();   /* κάρτες ισοζυγίου */
-            renderCalendar();       /* ημερολόγιο */
+            renderBalanceSelector();
+            renderAnalysisGrid();
+            renderCalendar();
             updateFloatingDebt();
         }
 
@@ -1213,7 +1271,7 @@
             const tabEl = document.getElementById(tabMap[targetId]);
             if (tabEl) { tabEl.classList.remove('tab-purple'); tabEl.classList.add('tab-cyan'); }
             if (targetId === 'base') { renderBaseTable(); renderMobileCards(); }
-            if (targetId === 'balance') { renderAnalysisGrid(); }
+            if (targetId === 'balance') { renderBalanceSelector(); renderAnalysisGrid(); }
             if (targetId === 'analysis') { renderCalendar(); }
         }
 
